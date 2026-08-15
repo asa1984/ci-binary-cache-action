@@ -13,10 +13,10 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Get store path of `${{ inputs.package }}`
+    - name: Get store path of `${{ inputs.packages }}`
       id: get-store-path
       shell: bash
-      run: echo "store-path=$(nix eval ${{ inputs.package }} --apply builtins.toString)" >> $GITHUB_OUTPUT
+      run: echo "store-path=$(nix eval ${{ inputs.packages }} --apply builtins.toString)" >> $GITHUB_OUTPUT
 
     - name: Create temporary directory
       id: create-temp-dir
@@ -35,7 +35,7 @@ runs:
       shell: bash
       run: nix copy --from file://${{ steps.create-temp-dir.outputs.temp-dir }} --no-check-sigs ${{ inputs.packages }}
 
-    - name: If cache miss, copy `${{ inputs.package }}` to binary cache
+    - name: If cache miss, copy `${{ inputs.packages }}` to binary cache
       if: steps.cache.outputs.cache-hit != 'true'
       shell: bash
       run: nix copy --to file://${{ steps.create-temp-dir.outputs.temp-dir }}?compression=${{ inputs.compression }} ${{ inputs.packages }}
